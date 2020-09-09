@@ -90,7 +90,7 @@ int main()
     cout << "Beginning Search" << endl;
     node startNode;
     node goalNode;
-    priority_queue<node> frontier;
+    
 
 
 
@@ -117,6 +117,7 @@ int main()
     }
     cityCoord.close();
 
+    //debug
     goalNode.displayState();
 
     cityCoord.open("coordinates.txt");
@@ -137,6 +138,7 @@ int main()
         break;
     }
 
+    //debug
     startNode.displayState();
     cityCoord.close();
 
@@ -148,4 +150,7 @@ int main()
     return 0;
 }
 
+void BestFS(node current, node goal)
+{
 
+}
