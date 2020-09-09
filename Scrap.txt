@@ -1,0 +1,34 @@
+    while (!cityCoord.eof())
+    {
+        string temp;
+        float x, y, dist;
+        cityCoord >> temp;
+        if (temp != goal)
+        {
+            cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;
+        }
+        cityCoord >> x >> y;
+        node GoalNode(temp, "goal", x, y, 0);
+        gp = &GoalNode;
+        break;
+    }
+
+    gp->displayState();
+
+    //Set up the start
+    while (!cityCoord.eof())
+    {
+        string temp;
+        float x, y, dist;
+        cityCoord >> temp;
+        if (temp != start)
+        {
+            cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;
+        }
+        cityCoord >> x >> y;
+        node CurrNode(temp, "start?", x, y, findDist(x,y, gp->x, gp->y));
+        cp = &CurrNode;
+        break;
+    }

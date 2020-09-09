@@ -1,0 +1,2 @@
+C:\Users\miste\Desktop\CS449BestFirstSearch\Debug\CS449BestFirstSearch.exe
+C:\Users\miste\Desktop\CS449BestFirstSearch\Debug\CS449BestFirstSearch.pdb

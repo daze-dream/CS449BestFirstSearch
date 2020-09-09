@@ -1,0 +1,6 @@
+﻿  CS449BestFirstSearch.cpp
+C:\Users\miste\Desktop\CS449BestFirstSearch\CS449BestFirstSearch.cpp(8,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\miste\Desktop\CS449BestFirstSearch\CS449BestFirstSearch.cpp(32,9): warning C4551: function call missing argument list
+C:\Users\miste\Desktop\CS449BestFirstSearch\CS449BestFirstSearch.cpp(106,21): warning C4101: 'final': unreferenced local variable
+C:\Users\miste\Desktop\CS449BestFirstSearch\CS449BestFirstSearch.cpp(127,21): warning C4101: 'final': unreferenced local variable
+  CS449BestFirstSearch.vcxproj -> C:\Users\miste\Desktop\CS449BestFirstSearch\Debug\CS449BestFirstSearch.exe
