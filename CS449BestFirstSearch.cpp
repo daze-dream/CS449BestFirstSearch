@@ -210,6 +210,7 @@ void BestFS(node current, node goal)
             break;
         }
 
+        //need to reverse this to get the "minimum". Might want to check the bool override.
         temp = frontier.top();
 
     }
