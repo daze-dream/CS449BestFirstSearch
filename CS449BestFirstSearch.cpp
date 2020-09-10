@@ -5,9 +5,13 @@
 #include <fstream>
 #include <queue>
 #include <iomanip>
-#include "node.h";
+#include <stack>
+
+#include "node.h"
 
 using namespace std;
+
+void BestFS(node current, node goal);
 
 // override priority queue comparison thing. Might be better in the class? Oh well.
 bool operator<(const node& a, const node& b)
@@ -20,7 +24,7 @@ bool operator<(const node& a, const node& b)
 void openingScreen() 
 {
     ifstream cityListy;
-    cityListy.open("coordinates.txt");
+    cityListy.open("CoordinatesNew.txt");
     int count = 0;
     string city;
     cout << "Welcome to the Totally Accurate Travel Guide. Your cities are: " << endl;
@@ -29,7 +33,7 @@ void openingScreen()
     if (cityListy.fail())
     {
         cout << "this ain't it chief" << endl;
-        exit;
+        exit(1);
     }
 
     while (!cityListy.eof())
@@ -98,7 +102,7 @@ int main()
     //Set up the nodes for the search function
 
     //Find the goal node
-    cityCoord.open("coordinates.txt");
+    cityCoord.open("CoordinatesNew.txt");
     while (!cityCoord.eof())
     {
         
@@ -120,7 +124,7 @@ int main()
     //debug
     goalNode.displayState();
 
-    cityCoord.open("coordinates.txt");
+    cityCoord.open("CoordinatesNew.txt");
     //start node
     while (!cityCoord.eof())
     {
@@ -142,7 +146,7 @@ int main()
     startNode.displayState();
     cityCoord.close();
 
-
+    BestFS(startNode, goalNode);
     
 
     cout << endl;
@@ -152,5 +156,62 @@ int main()
 
 void BestFS(node current, node goal)
 {
+    priority_queue<node> frontier;
+    stack<node> visited;
+
+    ifstream cityCoord;
+    ifstream cityAdj;
+    //frontier.push(current);
+    /*while (!frontier.empty())
+    {
+        
+    }*/
+    node temp = current;
+    while (temp.name != goal.name) // check if at goal
+    {
+        string tempName; // temp variable
+        cityAdj.open("AdjacenciesNew.txt"); // open adjacenies to start loading in nodes
+        while (!cityAdj.eof()) // go through the adj file
+        {
+            cityAdj >> tempName; // start checking for the adjacency list
+            if (tempName == current.name) // if the tempAdj name matches the current node's name
+            {
+                while (cityAdj.peek() != '\n') // while we do not reach a newline character in adj
+                {
+                    cityAdj >> tempName; // load in the next name 
+                    cityCoord.open("CoordinatesNew.txt");
+                    string tempCoordN;
+                    float tx, ty;
+                    while (!cityCoord.eof())
+                    {
+                        cityCoord >> tempCoordN;
+                        if (tempCoordN == tempName)
+                        {
+                            cityCoord >> tx >> ty;
+                            node* p = new node;
+                            p->setData(tempCoordN, tx, ty, findDist(tx, ty, goal.x, goal.y));
+                            frontier.push(*p);
+                            cityCoord.close();
+                            break;
+                        }
+                        else
+                        {
+                            cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        }
+                    }
+                }
+            }
+
+            else
+            {
+                cityAdj.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
+
+            break;
+        }
+
+        temp = frontier.top();
+
+    }
 
 }

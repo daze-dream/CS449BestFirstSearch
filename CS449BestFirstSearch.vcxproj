@@ -152,7 +152,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Adjacencies.txt" />
+    <Text Include="AdjacenciesNew.txt" />
     <Text Include="coordinates.txt" />
+    <Text Include="CoordinatesNew.txt" />
     <Text Include="Scrap.txt" />
   </ItemGroup>
   <ItemGroup>

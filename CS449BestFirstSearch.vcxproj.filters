@@ -26,6 +26,8 @@
     <Text Include="Adjacencies.txt" />
     <Text Include="coordinates.txt" />
     <Text Include="Scrap.txt" />
+    <Text Include="AdjacenciesNew.txt" />
+    <Text Include="CoordinatesNew.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CS461Program1Fall2020.pdf" />
