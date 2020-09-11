@@ -40,7 +40,7 @@ void node::setData(string n, float x, float y, float d)
 
 void node::displayState()
 {
-	cout << "Current Node:" << endl;
+	cout << "Current Node:" << this->name << endl;
 	cout << "X: " << x << "Y: " << y << endl;
-	cout << "Dist to Goal: " << dist << endl;
+	cout << "Dist to Goal: " << dist << endl << endl;
 }

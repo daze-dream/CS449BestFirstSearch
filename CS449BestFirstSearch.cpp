@@ -6,11 +6,13 @@
 #include <queue>
 #include <iomanip>
 #include <stack>
+#include <set>
 
 #include "node.h"
 
 using namespace std;
 
+//the main search function. Jank.
 void BestFS(node current, node goal);
 
 // override priority queue comparison thing. Might be better in the class? Oh well.
@@ -59,7 +61,7 @@ float findDist(float cx, float cy, float gx, float gy)
     return sqrt(p3);
 }
 
-
+//driver
 int main()
 {
     ifstream cityCoord;
@@ -156,8 +158,11 @@ int main()
 
 void BestFS(node current, node goal)
 {
-    priority_queue<node> frontier;
-    stack<node> visited;
+    priority_queue<node> frontier; //cities we have no visited yet, but can see
+    queue<node> path; // trace the path
+
+    set<node> visited; // keep track of what we have visited to keep out of queue
+    
 
     ifstream cityCoord;
     ifstream cityAdj;
@@ -167,6 +172,8 @@ void BestFS(node current, node goal)
         
     }*/
     node temp = current;
+
+    visited.insert(temp);
     while (temp.name != goal.name) // check if at goal
     {
         string tempName; // temp variable
@@ -174,44 +181,54 @@ void BestFS(node current, node goal)
         while (!cityAdj.eof()) // go through the adj file
         {
             cityAdj >> tempName; // start checking for the adjacency list
-            if (tempName == current.name) // if the tempAdj name matches the current node's name
+            if (tempName == temp.name) // if the tempAdj name matches the current node's name
             {
                 while (cityAdj.peek() != '\n') // while we do not reach a newline character in adj
                 {
-                    cityAdj >> tempName; // load in the next name 
-                    cityCoord.open("CoordinatesNew.txt");
-                    string tempCoordN;
-                    float tx, ty;
-                    while (!cityCoord.eof())
+                    cityAdj >> tempName; // load in the next name. We're building the "adjacent nodes"
+                    cityCoord.open("CoordinatesNew.txt"); //open the coordinates file
+                    string tempCoordN; // temporoary name storage for file processing
+                    float tx, ty; //temp x y storage
+                    while (!cityCoord.eof()) // going through the file..
                     {
-                        cityCoord >> tempCoordN;
-                        if (tempCoordN == tempName)
+                        cityCoord >> tempCoordN; //load in the city name
+                        if (tempCoordN == tempName) // if we find a match 
                         {
-                            cityCoord >> tx >> ty;
-                            node* p = new node;
-                            p->setData(tempCoordN, tx, ty, findDist(tx, ty, goal.x, goal.y));
-                            frontier.push(*p);
-                            cityCoord.close();
-                            break;
+                            // might have to check the set for duplicate names later, aka what we've alreayd visited
+                            //idea: when you reach a new node and it will loop, check the closest child, and if it is in the visited,
+                            //break out, pop that value out of the visited, and go back to the frontier city.
+                            cityCoord >> tx >> ty; // load in the x y coords for the current city
+                            node* p = new node; // make a new pointer
+                            p->setData(tempCoordN, tx, ty, findDist(tx, ty, goal.x, goal.y)); // "construct" the node
+                            frontier.push(*p); // push the actual value on to the frontier
+                            cityCoord.close(); // close file
+                            break; // break from loop, and go on til the next name in the adjacency file
                         }
-                        else
+                        else // if the names do not match n coordinates...
                         {
-                            cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                            cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // ignore the rest and go to next line
                         }
                     }
                 }
             }
 
-            else
+            else // if the names do not match in the adjacency file...
             {
-                cityAdj.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                cityAdj.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // go to next line to try and find adjacency
+                continue;
             }
 
-            break;
+            break;// when the file is done with, end the loop. 
         }
 
         //need to reverse this to get the "minimum". Might want to check the bool override.
-        temp = frontier.top();
+        cityAdj.close(); // close the file
+        cout << frontier.top().name << " " << frontier.top().dist << endl;
+        visited.insert(frontier.top()); // put the node in the visited container
+        path.push(frontier.top()); // push that into our path.
+        temp = frontier.top(); // we change our temp to the "top" (lowest) value and start the loop again.
+        priority_queue<node>  empty;
+        swap(frontier, empty); // clear the queue by swapping it with an empty version
 
     }
 
