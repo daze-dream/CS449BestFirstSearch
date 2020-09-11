@@ -16,7 +16,7 @@ void BestFS(node current, node goal);
 // override priority queue comparison thing. Might be better in the class? Oh well.
 bool operator<(const node& a, const node& b)
 {
-    return a.dist < b.dist;
+    return a.dist > b.dist;
 }
 
 
