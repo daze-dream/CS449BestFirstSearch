@@ -67,22 +67,10 @@ int main()
     ifstream cityCoord;
     ifstream cityAdj;
     string startName, goalName;
-
-
-    /* 
-    here's what we do: we make a node for the start. Then we make new nodes from the adjacency and coordinates list, calculate the
-        dist, and then push them onto the frontier queue. Then we select the best one and do the search again, so I guess
-        it's recursive. hard part is going to be managing the files. Might be some overhead? meh for now.
-    */
-    
-    
-
-    // testing distance formula. 
+ 
     openingScreen();
-
-
    
-    // Error checking needed later
+    // Error checking needed later for valid cities
 
     cout << endl << endl;
     cout << "Enter your starting city: ";
