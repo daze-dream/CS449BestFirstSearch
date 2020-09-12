@@ -203,6 +203,8 @@ void BestFS(node current, node goal)
                             if (visited.count(*p) >= 1) // in theory, if this node already exists within the visited struct, ignore it
                             {
                                 //IT WORKS but have to make sure to fix the cities with only one adjacency looping back
+                                //The idea to fix is to check if the name exists in Visited and if 
+                                //  peek('\n') immediately returns after one time. So might need a counter
                                 cityCoord.close(); //closes the file
                                 break; // or continue? Only testing will tell
                             }
