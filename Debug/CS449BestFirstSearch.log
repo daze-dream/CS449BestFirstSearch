@@ -1,6 +1,4 @@
 ﻿  CS449BestFirstSearch.cpp
 C:\Users\miste\Desktop\CS449BestFirstSearch\CS449BestFirstSearch.cpp(112,21): warning C4101: 'final': unreferenced local variable
 C:\Users\miste\Desktop\CS449BestFirstSearch\CS449BestFirstSearch.cpp(134,21): warning C4101: 'final': unreferenced local variable
-  node.cpp
-  Generating Code...
   CS449BestFirstSearch.vcxproj -> C:\Users\miste\Desktop\CS449BestFirstSearch\Debug\CS449BestFirstSearch.exe

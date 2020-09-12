@@ -200,11 +200,17 @@ void BestFS(node current, node goal)
                             cityCoord >> tx >> ty; // load in the x y coords for the current city
                             node* p = new node; // make a new pointer
                             p->setData(tempCoordN, tx, ty, findDist(tx, ty, goal.x, goal.y)); // "construct" the node
+                            if (visited.count(*p) >= 1) // in theory, if this node already exists within the visited struct, ignore it
+                            {
+                                //IT WORKS but have to make sure to fix the cities with only one adjacency looping back
+                                cityCoord.close(); //closes the file
+                                break; // or continue? Only testing will tell
+                            }
                             frontier.push(*p); // push the actual value on to the frontier
                             cityCoord.close(); // close file
                             break; // break from loop, and go on til the next name in the adjacency file
                         }
-                        else // if the names do not match n coordinates...
+                        else // if the names do not match any coordinates...
                         {
                             cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // ignore the rest and go to next line
                         }
