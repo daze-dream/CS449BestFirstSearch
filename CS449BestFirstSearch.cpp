@@ -81,7 +81,6 @@ int main()
     cin >> goalName;
     cout << endl;
 
-    cout << "Beginning Search" << endl;
     node startNode;
     node goalNode;
     
@@ -112,7 +111,7 @@ int main()
     cityCoord.close();
 
     //debug
-    goalNode.displayState();
+    //goalNode.displayState();
 
     cityCoord.open("CoordinatesNew.txt");
     //start node
@@ -133,11 +132,16 @@ int main()
     }
 
     //debug
-    startNode.displayState();
+    //startNode.displayState();
     cityCoord.close();
+
+    cout << "Beginning Search Function" << endl;
+    cout << "Starting at: " << endl;
+    cout << startNode.name << " " << startNode.dist << "->" << endl << endl;
 
     BestFS(startNode, goalNode);
     
+   
 
     cout << endl;
     system("pause");
@@ -148,6 +152,8 @@ void BestFS(node current, node goal)
 {
     priority_queue<node> frontier; //cities we have no visited yet, but can see
     queue<node> path; // trace the path
+    int count = 0; // generic count 
+    node megaTemp; // even more temporary variables because yes
 
     set<node> visited; // keep track of what we have visited to keep out of queue
     
@@ -174,6 +180,7 @@ void BestFS(node current, node goal)
                 while (cityAdj.peek() != '\n') // while we do not reach a newline character in adj
                 {
                     cityAdj >> tempName; // load in the next name. We're building the "adjacent nodes"
+                    count++;
                     cityCoord.open("CoordinatesNew.txt"); //open the coordinates file
                     string tempCoordN; // temporoary name storage for file processing
                     float tx, ty; //temp x y storage
@@ -218,14 +225,33 @@ void BestFS(node current, node goal)
         }
 
         //need to reverse this to get the "minimum". Might want to check the bool override.
-        cityAdj.close(); // close the file
+
+         // close the file
+        if (cityAdj.peek() == '\n' && count <= 1)
+        {
+            cout << temp.name << " " << temp.dist << endl; //output the city 
+            visited.insert(temp); //put that city in the visited so we avoid it when going back to the frontier. This is probably unnecessary
+                                   // since the city is already in the visited thing, but just to make sure IT DOESN'T HAPPEN
+            temp = megaTemp; // reset temp to the previous city, which megaTemp stores
+            priority_queue<node>  empty; // create an empty queue
+            swap(frontier, empty); // clear the queue by swapping it with an empty version
+            count = 0; //reset the counter
+            cityAdj.close(); // close the file
+
+            cout << "Encountered a loop. Returning to select a new city..." << endl;
+            continue;
+        }
+
+        cityAdj.close();
+
+        megaTemp = temp; //this is to preseve the last node just in case the next search returns a loop. 
         cout << frontier.top().name << " " << frontier.top().dist << endl;
         visited.insert(frontier.top()); // put the node in the visited container
         path.push(frontier.top()); // push that into our path.
         temp = frontier.top(); // we change our temp to the "top" (lowest) value and start the loop again.
         priority_queue<node>  empty;
         swap(frontier, empty); // clear the queue by swapping it with an empty version
-
+        count = 0;
     }
 
 }
