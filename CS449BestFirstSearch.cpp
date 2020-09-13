@@ -1,6 +1,14 @@
 // CS449BestFirstSearch.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+/* Best First Search
+Takes the names of two cities and utilizing Best First Search with the heuristic of smallest distance to goal, finds a path.
+This is a heavy I/O approach: instead of making the graph data into a data struct, this opens the files frequently and creates
+    the nodes as necessary.
+Improvements: probably could make the node creation a function.
+              change file names so that it could work with any file.
+*/
+
 #include <iostream>
 #include <fstream>
 #include <queue>
@@ -64,37 +72,52 @@ float findDist(float cx, float cy, float gx, float gy)
 //driver
 int main()
 {
-    ifstream cityCoord;
-    ifstream cityAdj;
-    string startName, goalName;
-    set<string> validNames;
+    ifstream cityCoord; //coordinates file
+    ifstream cityAdj; //adjacencies file
+    string startName, goalName; //names for input
+    set<string> validNames; // a set to keep track of valid cities to input
     char looperino = ' '; // for starting the loop 
-    int validInputCount = 0;
+    int validInputCount = 0; // counter for while loops. Yes it is jank.
 
+    //make sure the files we need are there
 
-    //set up valid names for search
+    cityCoord.open("CoordinatesNew.txt");
+    cityAdj.open("AdjacenciesNew.txt");
+
+    if (cityAdj.fail() || cityCoord.fail())
+    {
+        cout << "Necesary files were not found. Make sure that the files CoordinatesNew.txt and AdjacenciesNew.txt are in the directory. " << endl;
+        return 0;
+    }
+
+    cityCoord.close();
+    cityAdj.close();
+
     cityCoord.open("CoordinatesNew.txt");
 
-    string cityValid;
+ 
 
     cin.clear();
+
+    //set up valid names for search
     while (!cityCoord.eof())
     {
-
+        string cityValid; //temp store names in coordinates
         cityCoord >> cityValid;
         validNames.insert(cityValid);
         cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
     cityCoord.close();
-    while (looperino != 'Q')
+    while (looperino != 'Q') // This whole driver program is in a loop so you can find as many paths as you want.
     {
+        //display the possible cities 
         openingScreen();
 
-        // Error checking needed later for valid cities
 
         cout << endl << endl;
 
+        //begin loop for valid input
         while (validInputCount == 0)
         {
             cout << "Enter your starting city: ";
@@ -115,8 +138,9 @@ int main()
 
         
 
-        validInputCount = 0;
+        validInputCount = 0; // reset variable
 
+        //same as above
         while (validInputCount == 0)
         {
             cout << "Enter your goal city: ";
@@ -135,6 +159,8 @@ int main()
 
         }
         cout << endl;
+
+        validInputCount = 0; //reset
 
         cin.clear();
  
@@ -191,16 +217,16 @@ int main()
         cityCoord.close();
 
         cout << "Beginning Search Function" << endl;
-        cout << "Starting at: " << endl;
-        cout << startNode.name << " " << startNode.dist << "->" << endl << endl;
+        cout << "START: " << endl;
+        cout << left << setw(15) << startNode.name << " " << "| Distance remaining: " << startNode.dist << " " << "->" << endl;
 
         BestFS(startNode, goalNode);
 
         cout << "Find another route? Type and enter 'Q' to quit, or any other key to continue: ";
         cin >> looperino;
         looperino = toupper(looperino);
-        cin.clear();
-
+        //cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << endl;
 
     }
 
@@ -211,10 +237,10 @@ int main()
 
 void BestFS(node current, node goal)
 {
-    priority_queue<node> frontier; //cities we have no visited yet, but can see
+    priority_queue<node> frontier; //cities we have not visited yet, but can see
     queue<node> path; // trace the path
     int count = 0; // generic count 
-    int dangerLoop = 0;
+    int dangerLoop = 0; // this is for when we get into an impossible loop
     node megaTemp; // even more temporary variables because yes
 
     set<node> visited; // keep track of what we have visited to keep out of queue
@@ -223,9 +249,9 @@ void BestFS(node current, node goal)
     ifstream cityCoord;
     ifstream cityAdj;
 
-    node temp = current;
-
-    visited.insert(temp);
+    node temp = current; //capture the node
+    path.push(temp); // begin the path
+    visited.insert(temp); // we have visited the start city.
     while (temp.name != goal.name) // check if at goal
     {
         string tempName; // temp variable
@@ -238,7 +264,7 @@ void BestFS(node current, node goal)
                 while (cityAdj.peek() != '\n') // while we do not reach a newline character in adj
                 {
                     cityAdj >> tempName; // load in the next name. We're building the "adjacent nodes"
-                    count++;
+                    count++; // this has been deprecated, but was useful for debugging.
                     cityCoord.open("CoordinatesNew.txt"); //open the coordinates file
                     string tempCoordN; // temporoary name storage for file processing
                     float tx, ty; //temp x y storage
@@ -247,9 +273,7 @@ void BestFS(node current, node goal)
                         cityCoord >> tempCoordN; //load in the city name
                         if (tempCoordN == tempName) // if we find a match 
                         {
-                            // might have to check the set for duplicate names later, aka what we've alreayd visited
-                            //idea: when you reach a new node and it will loop, check the closest child, and if it is in the visited,
-                            //break out, pop that value out of the visited, and go back to the frontier city.
+
                             cityCoord >> tx >> ty; // load in the x y coords for the current city
                             node* p = new node; // make a new pointer
                             p->setData(tempCoordN, tx, ty, findDist(tx, ty, goal.x, goal.y)); // "construct" the node
@@ -285,10 +309,10 @@ void BestFS(node current, node goal)
 
         //need to reverse this to get the "minimum". Might want to check the bool override.
 
-         // close the file
+        // Now...if we find ourselves at a loop where all the adjacent cities are visited, we go back to the old city and select something different
         if (cityAdj.peek() == '\n' && /*count <= 1 &&*/ frontier.size() == 0)
         {
-            cout << temp.name << " " << temp.dist << endl; //output the city 
+            cout << temp.name << " " << "Distance remaining: " << temp.dist << " " <<  " ->" << endl; //output the city 
             visited.insert(temp); //put that city in the visited so we avoid it when going back to the frontier. This is probably unnecessary
                                    // since the city is already in the visited thing, but just to make sure IT DOESN'T HAPPEN
             temp = megaTemp; // reset temp to the previous city, which megaTemp stores
@@ -297,12 +321,12 @@ void BestFS(node current, node goal)
             swap(frontier, empty); // clear the queue by swapping it with an empty version
             count = 0; //reset the counter
             cityAdj.close(); // close the file
-            if (dangerLoop >= 10)
+            if (dangerLoop >= 10) // When the heuristic fails and the pathfinding is stuck, aka all the cities around it are visited...
             {
-                cout << "Too many loops detected. The Best First Search has failed to find a path :/ . " << endl;
+                cout << "FATAL ERROR: Too many loops detected. The Best First Search has failed to find a path :/ . " << endl;
                 break;
             }
-            cout << "Encountered a loop. Returning to select a new city..." << endl;
+            cout << "Encountered a loop. Returning to previous city to select a new city..." << endl;
             continue;
         }
 
@@ -310,7 +334,7 @@ void BestFS(node current, node goal)
 
 
         megaTemp = temp; //this is to preseve the last node just in case the next search returns a loop. 
-        cout << frontier.top().name << " " << frontier.top().dist << endl;
+        cout << left << setw(15) << frontier.top().name << " " << "| Distance remaining: " << frontier.top().dist << " " << "->" << endl;
         visited.insert(frontier.top()); // put the node in the visited container
         path.push(frontier.top()); // push that into our path.
         temp = frontier.top(); // we change our temp to the "top" (lowest) value and start the loop again.
@@ -319,4 +343,21 @@ void BestFS(node current, node goal)
         count = 0;
     }
 
+    // if a valid path was found, output the path we took. 
+    if (temp.name == goal.name)
+    {
+        cout << "We've reached the goal! The path we took was: " << endl;
+        while (path.size() != 0)
+        {
+            cout << path.front().name;
+            if (path.size() != 1)
+            {
+                cout << " -> ";
+            }
+            path.pop();
+        }
+        cout << endl;
+
+    }
+    cout << "Pathfind completed" << endl;
 }
