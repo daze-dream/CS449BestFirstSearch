@@ -158,6 +158,7 @@
     <Text Include="Scrap.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="CS461Program1Fall2020.pdf" />
   </ItemGroup>
   <ItemGroup>

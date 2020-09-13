@@ -31,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CS461Program1Fall2020.pdf" />
+    <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="node.h">

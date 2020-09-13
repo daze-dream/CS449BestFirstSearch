@@ -15,7 +15,7 @@ using namespace std;
 //the main search function. Jank.
 void BestFS(node current, node goal);
 
-// override priority queue comparison thing. Might be better in the class? Oh well.
+// override priority queue comparison thing. Might be better in the node class? Oh well.
 bool operator<(const node& a, const node& b)
 {
     return a.dist > b.dist;
@@ -67,83 +67,144 @@ int main()
     ifstream cityCoord;
     ifstream cityAdj;
     string startName, goalName;
- 
-    openingScreen();
-   
-    // Error checking needed later for valid cities
-
-    cout << endl << endl;
-    cout << "Enter your starting city: ";
-    cin >> startName;
-    cout << endl;
-
-    cout << "Enter your ending city: ";
-    cin >> goalName;
-    cout << endl;
-
-    node startNode;
-    node goalNode;
-    
+    set<string> validNames;
+    char looperino = ' '; // for starting the loop 
+    int validInputCount = 0;
 
 
-
-
-    //Set up the nodes for the search function
-
-    //Find the goal node
+    //set up valid names for search
     cityCoord.open("CoordinatesNew.txt");
+
+    string cityValid;
+
+    cin.clear();
     while (!cityCoord.eof())
     {
+
+        cityCoord >> cityValid;
+        validNames.insert(cityValid);
+        cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+
+    cityCoord.close();
+    while (looperino != 'Q')
+    {
+        openingScreen();
+
+        // Error checking needed later for valid cities
+
+        cout << endl << endl;
+
+        while (validInputCount == 0)
+        {
+            cout << "Enter your starting city: ";
+            cin >> startName;
+            if (validNames.count(startName) == 1)
+
+            {
+                validInputCount++;
+            }
+            else
+            {
+                cout << "No such city found. Please enter a valid city from the choices above" << endl;
+            }
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+        cout << endl;
+
         
-        string temp;
-        float x, y, final;
-        cityCoord >> temp;
-        if (temp != goalName)
+
+        validInputCount = 0;
+
+        while (validInputCount == 0)
         {
-            cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            continue;
+            cout << "Enter your goal city: ";
+            cin >> goalName;
+            if (validNames.count(goalName) == 1)
+
+            {
+                validInputCount++;
+            }
+            else
+            {
+                cout << "No such city found. Please enter a valid city from the choices above" << endl;
+            }
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        }
+        cout << endl;
+
+        cin.clear();
+ 
+
+        node startNode;
+        node goalNode;
+
+
+        //Set up the nodes for the search function
+
+        //Find the goal node
+        cityCoord.open("CoordinatesNew.txt");
+        while (!cityCoord.eof())
+        {
+
+            string temp;
+            float x, y, final;
+            cityCoord >> temp;
+            if (temp != goalName)
+            {
+                cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                continue;
+            }
+
+            cityCoord >> x >> y;
+            goalNode.setData(temp, x, y, 0);
+            break;
+        }
+        cityCoord.close();
+
+        //debug
+        //goalNode.displayState();
+
+        cityCoord.open("CoordinatesNew.txt");
+        //start node
+        while (!cityCoord.eof())
+        {
+            string temp;
+            float x, y, final;
+            cityCoord >> temp;
+            if (temp != startName)
+            {
+                cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                continue;
+            }
+
+            cityCoord >> x >> y;
+            startNode.setData(temp, x, y, findDist(x, y, goalNode.x, goalNode.y));
+            break;
         }
 
-        cityCoord >> x >> y;
-        goalNode.setData(temp, x, y, 0);
-        break;
-    }
-    cityCoord.close();
+        //debug
+        //startNode.displayState();
+        cityCoord.close();
 
-    //debug
-    //goalNode.displayState();
+        cout << "Beginning Search Function" << endl;
+        cout << "Starting at: " << endl;
+        cout << startNode.name << " " << startNode.dist << "->" << endl << endl;
 
-    cityCoord.open("CoordinatesNew.txt");
-    //start node
-    while (!cityCoord.eof())
-    {
-        string temp;
-        float x, y, final;
-        cityCoord >> temp;
-        if (temp != startName)
-        {
-            cityCoord.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            continue;
-        }
+        BestFS(startNode, goalNode);
 
-        cityCoord >> x >> y;
-        startNode.setData(temp, x, y, findDist(x, y, goalNode.x, goalNode.y));
-        break;
+        cout << "Find another route? Type and enter 'Q' to quit, or any other key to continue: ";
+        cin >> looperino;
+        looperino = toupper(looperino);
+        cin.clear();
+
+
     }
 
-    //debug
-    //startNode.displayState();
-    cityCoord.close();
-
-    cout << "Beginning Search Function" << endl;
-    cout << "Starting at: " << endl;
-    cout << startNode.name << " " << startNode.dist << "->" << endl << endl;
-
-    BestFS(startNode, goalNode);
-    
-   
-
-    cout << endl;
+    cout << "GOODBYE" << endl;
     system("pause");
     return 0;
 }
@@ -153,6 +214,7 @@ void BestFS(node current, node goal)
     priority_queue<node> frontier; //cities we have no visited yet, but can see
     queue<node> path; // trace the path
     int count = 0; // generic count 
+    int dangerLoop = 0;
     node megaTemp; // even more temporary variables because yes
 
     set<node> visited; // keep track of what we have visited to keep out of queue
@@ -160,11 +222,7 @@ void BestFS(node current, node goal)
 
     ifstream cityCoord;
     ifstream cityAdj;
-    //frontier.push(current);
-    /*while (!frontier.empty())
-    {
-        
-    }*/
+
     node temp = current;
 
     visited.insert(temp);
@@ -200,6 +258,7 @@ void BestFS(node current, node goal)
                                 //IT WORKS but have to make sure to fix the cities with only one adjacency looping back
                                 //The idea to fix is to check if the name exists in Visited and if 
                                 //  peek('\n') immediately returns after one time. So might need a counter
+                                
                                 cityCoord.close(); //closes the file
                                 break; // or continue? Only testing will tell
                             }
@@ -227,22 +286,28 @@ void BestFS(node current, node goal)
         //need to reverse this to get the "minimum". Might want to check the bool override.
 
          // close the file
-        if (cityAdj.peek() == '\n' && count <= 1)
+        if (cityAdj.peek() == '\n' && /*count <= 1 &&*/ frontier.size() == 0)
         {
             cout << temp.name << " " << temp.dist << endl; //output the city 
             visited.insert(temp); //put that city in the visited so we avoid it when going back to the frontier. This is probably unnecessary
                                    // since the city is already in the visited thing, but just to make sure IT DOESN'T HAPPEN
             temp = megaTemp; // reset temp to the previous city, which megaTemp stores
+            dangerLoop++;
             priority_queue<node>  empty; // create an empty queue
             swap(frontier, empty); // clear the queue by swapping it with an empty version
             count = 0; //reset the counter
             cityAdj.close(); // close the file
-
+            if (dangerLoop >= 10)
+            {
+                cout << "Too many loops detected. The Best First Search has failed to find a path :/ . " << endl;
+                break;
+            }
             cout << "Encountered a loop. Returning to select a new city..." << endl;
             continue;
         }
 
         cityAdj.close();
+
 
         megaTemp = temp; //this is to preseve the last node just in case the next search returns a loop. 
         cout << frontier.top().name << " " << frontier.top().dist << endl;
